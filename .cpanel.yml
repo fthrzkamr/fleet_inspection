@@ -1,0 +1,10 @@
+---
+# Konfigurasi deployment cPanel Git Version Control.
+# PENTING: ganti DEPLOYPATH di bawah sesuai lokasi folder situs live Anda yang sebenarnya
+# (cek lewat cPanel > File Manager, klik kanan folder situsnya untuk lihat path lengkapnya).
+# Baru berjalan kalau Anda klik tombol "Deploy HEAD Commit" di halaman Git Version Control,
+# TIDAK otomatis berjalan sendiri hanya karena ada commit baru.
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/GANTI_USERNAME/public_html/fleet_inspection/
+    - /bin/cp -R ./* $DEPLOYPATH

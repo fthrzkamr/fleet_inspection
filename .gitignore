@@ -1,0 +1,15 @@
+# Kredensial database per-environment (lihat config.local.example.php untuk template)
+/config.local.php
+
+# Konten yang di-generate & berbeda per environment (QR code, foto bukti inspeksi, dsb)
+/uploads/*
+!/uploads/.gitkeep
+!/uploads/qr/
+/uploads/qr/*
+!/uploads/qr/.gitkeep
+
+# File sistem operasi / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

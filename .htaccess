@@ -1,0 +1,9 @@
+# FleetGuard Digital .htaccess
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} !^/fleet_inspection/public/
+    RewriteCond %{REQUEST_URI} !^/fleet_inspection/uploads/
+    RewriteRule ^$ public/index.php [L]
+</IfModule>

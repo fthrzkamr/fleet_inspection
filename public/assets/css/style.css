@@ -1,0 +1,417 @@
+/* FleetGuard Digital - Enterprise Modern Corporate Design System */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+
+:root {
+  --bg-body: #f1f5f9;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f8fafc;
+  --border-color: #e2e8f0;
+  --border-focus: #2563eb;
+  
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  
+  --primary: #1d4ed8;
+  --primary-hover: #1e40af;
+  --primary-subtle: #eff6ff;
+  --primary-border: #bfdbfe;
+  
+  --success: #059669;
+  --success-subtle: #ecfdf5;
+  --success-border: #a7f3d0;
+  --success-text: #065f46;
+  
+  --warning: #d97706;
+  --warning-subtle: #fffbeb;
+  --warning-border: #fde68a;
+  --warning-text: #92400e;
+  
+  --danger: #dc2626;
+  --danger-subtle: #fef2f2;
+  --danger-border: #fecaca;
+  --danger-text: #991b1b;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  background-color: var(--bg-body);
+  color: var(--text-primary);
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Enterprise Clean Card Styles */
+.card-glass {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.875rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card-glass:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  border-color: #cbd5e1;
+}
+
+.stat-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.875rem;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.08);
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 6px;
+  line-height: 1.2;
+}
+
+.badge-success {
+  background: var(--success-subtle);
+  color: var(--success-text);
+  border: 1px solid var(--success-border);
+}
+
+.badge-warning {
+  background: var(--warning-subtle);
+  color: var(--warning-text);
+  border: 1px solid var(--warning-border);
+}
+
+.badge-danger {
+  background: var(--danger-subtle);
+  color: var(--danger-text);
+  border: 1px solid var(--danger-border);
+}
+
+.badge-neutral {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.badge-primary {
+  background: var(--primary-subtle);
+  color: var(--primary);
+  border: 1px solid var(--primary-border);
+}
+
+/* STOP Pulse animation */
+.badge-pulse {
+  animation: pulse-border 2s infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.15);
+  }
+}
+
+/* Enterprise Buttons */
+.btn-primary {
+  background: #1d4ed8;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 0.55rem 1.15rem;
+  border-radius: 0.625rem;
+  border: 1px solid #1e40af;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.15s ease;
+}
+
+.btn-primary:hover {
+  background: #1e40af;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 0.55rem 1.15rem;
+  border-radius: 0.625rem;
+  border: 1px solid #b91c1c;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.15s ease;
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+}
+
+.btn-secondary {
+  background: #ffffff;
+  color: #334155;
+  font-weight: 600;
+  padding: 0.55rem 1.15rem;
+  border-radius: 0.625rem;
+  border: 1px solid #cbd5e1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  transition: all 0.15s ease;
+}
+
+.btn-secondary:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+/* Sidebar Navigation Link */
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  color: #ffffff;
+  background: #1e293b;
+}
+
+.nav-link-active {
+  color: #ffffff;
+  background: #1d4ed8;
+}
+
+.nav-link-active:hover {
+  background: #1d4ed8;
+}
+
+/* Checklist Condition Selector Group */
+.condition-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.625rem;
+}
+
+.condition-option {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.condition-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.condition-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 0.5rem;
+  border-radius: 0.625rem;
+  border: 2px solid #e2e8f0;
+  background: #f8fafc;
+  text-align: center;
+  transition: all 0.15s ease;
+  min-height: 68px;
+}
+
+.condition-option input[type="radio"]:checked + .card-ok {
+  border-color: #059669;
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.condition-option input[type="radio"]:checked + .card-warning {
+  border-color: #d97706;
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.condition-option input[type="radio"]:checked + .card-danger {
+  border-color: #dc2626;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+/* Steps Breadcrumb Progress */
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.step-indicator::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #e2e8f0;
+  z-index: 1;
+  transform: translateY(-50%);
+}
+
+.step-indicator-progress {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 2px;
+  background: #1d4ed8;
+  z-index: 1;
+  transform: translateY(-50%);
+  transition: width 0.3s ease;
+}
+
+.step-node {
+  position: relative;
+  z-index: 2;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  color: #64748b;
+  transition: all 0.2s ease;
+}
+
+.step-node.active {
+  border-color: #1d4ed8;
+  background: #1d4ed8;
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(29, 78, 216, 0.25);
+}
+
+.step-node.completed {
+  border-color: #059669;
+  background: #059669;
+  color: #ffffff;
+}
+
+/* Mobile Responsive Enhancements */
+@media (max-width: 640px) {
+  .condition-card {
+    padding: 0.5rem 0.25rem;
+    min-height: 62px;
+  }
+  .condition-card span {
+    font-size: 0.7rem !important;
+    line-height: 1.15;
+  }
+  .condition-card i {
+    font-size: 0.95rem !important;
+    margin-bottom: 0.15rem !important;
+  }
+  .stat-card {
+    padding: 0.875rem;
+  }
+}
+
+/* Print QR Card & Sheet Specifics */
+@media print {
+  @page {
+    size: auto;
+    margin: 10mm;
+  }
+  
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: auto !important;
+    height: auto !important;
+  }
+  
+  header, nav, footer, .no-print, #mobile-menu, #flash-container {
+    display: none !important;
+  }
+  
+  main {
+    padding: 0 !important;
+    margin: 0 auto !important;
+    max-width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+  
+  .print-area, .qr-card-print {
+    margin: 0 auto !important;
+    padding: 1.25rem !important;
+    box-shadow: none !important;
+    border: 2px solid #000000 !important;
+    border-radius: 12px !important;
+    width: 380px !important;
+    max-width: 380px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}

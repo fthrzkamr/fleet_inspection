@@ -38,21 +38,11 @@
             </select>
         </div>
 
-        <div class="sm:col-span-2">
-            <input type="date" name="tgl_awal" value="<?= htmlspecialchars($filterTglAwal) ?>" title="Servis Dari Tanggal"
-                   class="w-full py-2 px-3 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 focus:border-blue-600 outline-none">
-        </div>
-
-        <div class="sm:col-span-2">
-            <input type="date" name="tgl_akhir" value="<?= htmlspecialchars($filterTglAkhir) ?>" title="Servis Sampai Tanggal"
-                   class="w-full py-2 px-3 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 focus:border-blue-600 outline-none">
-        </div>
-
         <div class="sm:col-span-2 flex gap-2">
             <button type="submit" class="btn-primary w-full py-2 text-xs">
                 <i class="fa-solid fa-filter"></i> Filter
             </button>
-            <?php if (!empty($search) || !empty($filterCabang) || !empty($filterStatus) || !empty($filterTglAwal) || !empty($filterTglAkhir)): ?>
+            <?php if (!empty($search) || !empty($filterCabang) || !empty($filterStatus)): ?>
                 <a href="?" class="btn-secondary py-2 px-3 text-xs" title="Reset Filter">
                     <i class="fa-solid fa-rotate-left"></i>
                 </a>
@@ -208,6 +198,17 @@
                                     <a href="<?= BASE_URL ?>/public/riwayat_inspeksi.php?kendaraan_id=<?= $k['id'] ?>" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-blue-700" title="Riwayat Inspeksi">
                                         <i class="fa-solid fa-clock-rotate-left"></i>
                                     </a>
+                                    <?php if ($user['role'] === 'admin'): ?>
+                                        <form method="POST" action="" class="inline" id="delete-kendaraan-form-<?= (int)$k['id'] ?>">
+                                            <input type="hidden" name="action" value="delete_kendaraan">
+                                            <input type="hidden" name="delete_id" value="<?= (int)$k['id'] ?>">
+                                            <button type="button"
+                                                    onclick="confirmDeleteKendaraan(<?= (int)$k['id'] ?>, '<?= htmlspecialchars($k['no_polisi'] . ' (' . $k['asset_id'] . ')', ENT_QUOTES) ?>')"
+                                                    class="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-100 text-rose-700" title="Hapus Permanen">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </button>
+                                        </form>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                         </tr>

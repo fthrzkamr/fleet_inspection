@@ -369,7 +369,7 @@ require_once __DIR__ . '/../includes/layout_navbar.php';
     </div>
 
     <!-- Alert Box: Data Dokumen Belum Lengkap (STNK/KIR/Plat kosong) -->
-    <?php if ((int)$incompleteDocs['total_kendaraan'] > 0): ?>
+    <!-- <?php if ((int)$incompleteDocs['total_kendaraan'] > 0): ?>
         <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div class="flex items-start gap-2.5">
                 <i class="fa-solid fa-circle-info text-blue-600 mt-0.5"></i>
@@ -389,7 +389,7 @@ require_once __DIR__ . '/../includes/layout_navbar.php';
                 <i class="fa-solid fa-pen-to-square mr-1"></i> Lengkapi di Kelola Armada
             </a>
         </div>
-    <?php endif; ?>
+    <?php endif; ?> -->
 
     <!-- Enterprise Analytics Charts -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">

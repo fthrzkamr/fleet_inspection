@@ -60,12 +60,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
+// Handle Hapus Permanen Kendaraan (Admin Only)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_kendaraan') {
+    if ($user['role'] !== 'admin') {
+        flash_set('error', 'Hanya admin yang dapat menghapus data armada.');
+    } else {
+        $deleteId = (int)($_POST['delete_id'] ?? 0);
+        $stmtK = $pdo->prepare("SELECT * FROM kendaraan WHERE id = :id");
+        $stmtK->execute([':id' => $deleteId]);
+        $targetKendaraan = $stmtK->fetch();
+
+        if (!$targetKendaraan) {
+            flash_set('error', 'Data armada tidak ditemukan.');
+        } else {
+            try {
+                $pdo->prepare("DELETE FROM kendaraan WHERE id = :id")->execute([':id' => $deleteId]);
+
+                if (!empty($targetKendaraan['qr_code_path'])) {
+                    $qrFullPath = __DIR__ . '/../' . $targetKendaraan['qr_code_path'];
+                    if (is_file($qrFullPath)) {
+                        unlink($qrFullPath);
+                    }
+                }
+
+                flash_set('success', "Armada '{$targetKendaraan['no_polisi']}' ({$targetKendaraan['asset_id']}) beserta seluruh riwayat inspeksi dan servisnya berhasil dihapus permanen.");
+            } catch (PDOException $e) {
+                flash_set('error', 'Gagal menghapus armada: ' . $e->getMessage());
+            }
+        }
+    }
+    session_write_close();
+    header('Location: ' . BASE_URL . '/public/daftar_kendaraan.php');
+    exit;
+}
+
 // Filter & Search Parameters
 $search = trim($_GET['search'] ?? '');
 $filterCabang = trim($_GET['cabang'] ?? '');
 $filterStatus = trim($_GET['status'] ?? '');
-$filterTglAwal = trim($_GET['tgl_awal'] ?? '');
-$filterTglAkhir = trim($_GET['tgl_akhir'] ?? '');
 
 $whereSql = " WHERE 1=1";
 $params = [];
@@ -83,21 +115,6 @@ if (!empty($filterCabang)) {
 if (!empty($filterStatus)) {
     $whereSql .= " AND k.status = :status";
     $params[':status'] = $filterStatus;
-}
-
-// Filter berdasarkan tanggal servis: hanya tampilkan kendaraan yang punya
-// riwayat servis di rentang tanggal tersebut (join ke tabel riwayat_servis)
-if (!empty($filterTglAwal) || !empty($filterTglAkhir)) {
-    $whereSql .= " AND EXISTS (SELECT 1 FROM riwayat_servis rs WHERE rs.kendaraan_id = k.id";
-    if (!empty($filterTglAwal)) {
-        $whereSql .= " AND rs.tanggal_servis >= :tgl_awal";
-        $params[':tgl_awal'] = $filterTglAwal;
-    }
-    if (!empty($filterTglAkhir)) {
-        $whereSql .= " AND rs.tanggal_servis <= :tgl_akhir";
-        $params[':tgl_akhir'] = $filterTglAkhir;
-    }
-    $whereSql .= ")";
 }
 
 // Batasi data ke cabang sendiri untuk role pic yang sudah di-set cabang-nya
@@ -298,6 +315,22 @@ require_once __DIR__ . '/../includes/layout_navbar.php';
         </form>
     </div>
 </div>
+
+<script>
+function confirmDeleteKendaraan(id, label) {
+    showConfirmModal({
+        title: 'Hapus Armada ' + label + '?',
+        message: 'Data armada "' + label + '" beserta SELURUH riwayat inspeksi, riwayat servis, dan log perubahan terkait akan dihapus PERMANEN dan tidak dapat dikembalikan.',
+        confirmText: 'Ya, Hapus Permanen',
+        confirmType: 'danger',
+        icon: 'fa-solid fa-trash-can',
+        onConfirm: function() {
+            var form = document.getElementById('delete-kendaraan-form-' + id);
+            if (form) form.submit();
+        }
+    });
+}
+</script>
 
 <?php
 require_once __DIR__ . '/../includes/layout_footer.php';

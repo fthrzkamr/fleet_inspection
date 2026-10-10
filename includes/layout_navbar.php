@@ -27,6 +27,10 @@ $roleBadge = [
         <a href="<?= BASE_URL ?>/public/daftar_kendaraan.php" class="nav-link <?= in_array($currentScript, ['daftar_kendaraan.php', 'edit_kendaraan.php']) ? 'nav-link-active' : '' ?>">
             <i class="fa-solid fa-truck w-4 text-center"></i> Kelola Armada
         </a>
+<?php
+        endif;
+        if ($currentUser['role'] === 'admin'):
+?>
         <a href="<?= BASE_URL ?>/public/riwayat_servis.php" class="nav-link <?= $currentScript === 'riwayat_servis.php' ? 'nav-link-active' : '' ?>">
             <i class="fa-solid fa-screwdriver-wrench w-4 text-center"></i> Riwayat Servis
         </a>

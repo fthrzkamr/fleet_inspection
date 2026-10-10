@@ -12,6 +12,12 @@ $pdo = get_db();
 $user = current_user();
 $type = $_GET['type'] ?? 'kendaraan';
 
+if ($type === 'servis' && $user['role'] !== 'admin') {
+    $_SESSION['flash_error'] = 'Anda tidak memiliki hak akses untuk fitur Riwayat Servis.';
+    header('Location: ' . BASE_URL . '/public/dashboard.php');
+    exit;
+}
+
 // Batasi export ke cabang sendiri untuk role pic yang sudah di-set cabang-nya
 $scopeCabang = ($user['role'] === 'pic' && !empty($user['cabang'])) ? $user['cabang'] : null;
 

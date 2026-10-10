@@ -6,7 +6,7 @@ require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/functions.php';
 
-require_role(['admin', 'pic']);
+require_role(['admin']);
 
 $pdo = get_db();
 $user = current_user();

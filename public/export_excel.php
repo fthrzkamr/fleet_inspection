@@ -41,6 +41,7 @@ if ($type === 'servis') {
     $filterKendaraanId = (int)($_GET['kendaraan_id'] ?? 0);
     $filterTglAwal = trim($_GET['tgl_awal'] ?? '');
     $filterTglAkhir = trim($_GET['tgl_akhir'] ?? '');
+    $filterCabang = trim($_GET['cabang'] ?? '');
     $whereSql = " WHERE 1=1";
     $params = [];
     if ($filterKendaraanId > 0) {
@@ -54,6 +55,10 @@ if ($type === 'servis') {
     if (!empty($filterTglAkhir)) {
         $whereSql .= " AND s.tanggal_servis <= :tgl_akhir";
         $params[':tgl_akhir'] = $filterTglAkhir;
+    }
+    if (!empty($filterCabang)) {
+        $whereSql .= " AND k.cabang = :cabang";
+        $params[':cabang'] = $filterCabang;
     }
     if ($scopeCabang) {
         $whereSql .= " AND k.cabang = :cb";

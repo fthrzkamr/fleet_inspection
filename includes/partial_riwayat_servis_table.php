@@ -8,13 +8,22 @@
 <!-- Filter Bar -->
 <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
     <form method="GET" class="grid grid-cols-1 sm:grid-cols-12 gap-3">
-        <div class="sm:col-span-6">
+        <div class="sm:col-span-4">
             <select name="kendaraan_id" data-searchable data-placeholder="Cari kendaraan..." class="w-full py-2 px-3 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 focus:border-blue-600 outline-none">
                 <option value="">-- Semua Kendaraan --</option>
                 <?php foreach ($allVehicles as $v): ?>
                     <option value="<?= $v['id'] ?>" <?= $filterKendaraanId === (int)$v['id'] ? 'selected' : '' ?>>
                         <?= htmlspecialchars($v['asset_id']) ?> - <?= htmlspecialchars($v['no_polisi']) ?> (<?= htmlspecialchars($v['merk']) ?> <?= htmlspecialchars($v['model']) ?>)
                     </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <div class="sm:col-span-3">
+            <select name="cabang" class="w-full py-2 px-3 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 focus:border-blue-600 outline-none">
+                <option value="">-- Semua Cabang --</option>
+                <?php foreach (get_cabang_list($pdo, false) as $c): ?>
+                    <option value="<?= htmlspecialchars($c['nama_cabang']) ?>" <?= $filterCabang === $c['nama_cabang'] ? 'selected' : '' ?>><?= htmlspecialchars($c['nama_cabang']) ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -29,17 +38,49 @@
                    class="w-full py-2 px-3 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 focus:border-blue-600 outline-none">
         </div>
 
-        <div class="sm:col-span-2 flex gap-2">
-            <button type="submit" class="btn-primary w-full py-2 text-xs">
-                <i class="fa-solid fa-filter"></i> Filter
+        <div class="sm:col-span-1 flex gap-2">
+            <button type="submit" class="btn-primary w-full py-2 text-xs" title="Filter">
+                <i class="fa-solid fa-filter"></i>
             </button>
-            <?php if ($filterKendaraanId || $filterTglAwal || $filterTglAkhir): ?>
+            <?php if ($filterKendaraanId || $filterCabang || $filterTglAwal || $filterTglAkhir): ?>
                 <a href="?" class="btn-secondary py-2 px-3 text-xs" title="Reset">
                     <i class="fa-solid fa-rotate-left"></i>
                 </a>
             <?php endif; ?>
         </div>
     </form>
+</div>
+
+<!-- Ringkasan Nominal (mengikuti filter di atas) -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="stat-card bg-emerald-50/50 border-emerald-200 sm:col-span-1">
+        <div class="text-[11px] font-bold uppercase text-emerald-700">Total Nominal (Sesuai Filter)</div>
+        <div class="text-xl font-black text-emerald-800 mt-1">Rp <?= number_format($totalNominalFiltered, 0, ',', '.') ?></div>
+    </div>
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden sm:col-span-2">
+        <div class="px-4 py-2 border-b border-slate-100">
+            <h2 class="text-xs font-bold text-slate-900">Nominal per Cabang</h2>
+        </div>
+        <div class="overflow-x-auto max-h-32 overflow-y-auto">
+            <table class="w-full text-left text-xs text-slate-700">
+                <tbody class="divide-y divide-slate-100">
+                    <?php if (empty($nominalPerCabang)): ?>
+                        <tr>
+                            <td class="py-3 px-4 text-center text-slate-400">Tidak ada data untuk ditampilkan.</td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($nominalPerCabang as $nc): ?>
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="py-2 px-4 font-semibold text-slate-800"><?= htmlspecialchars($nc['cabang_label']) ?></td>
+                                <td class="py-2 px-4 text-center w-24"><?= (int)$nc['jumlah'] ?> servis</td>
+                                <td class="py-2 px-4 text-right font-semibold text-emerald-700 whitespace-nowrap">Rp <?= number_format((int)$nc['total_nominal'], 0, ',', '.') ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <!-- Table of Service Records -->

@@ -358,6 +358,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 $filterKendaraanId = (int)($_GET['kendaraan_id'] ?? 0);
 $filterTglAwal = trim($_GET['tgl_awal'] ?? '');
 $filterTglAkhir = trim($_GET['tgl_akhir'] ?? '');
+$filterCabang = trim($_GET['cabang'] ?? '');
 
 $whereSql = " WHERE 1=1";
 $params = [];
@@ -375,6 +376,11 @@ if (!empty($filterTglAwal)) {
 if (!empty($filterTglAkhir)) {
     $whereSql .= " AND s.tanggal_servis <= :tgl_akhir";
     $params[':tgl_akhir'] = $filterTglAkhir;
+}
+
+if (!empty($filterCabang)) {
+    $whereSql .= " AND k.cabang = :cabang";
+    $params[':cabang'] = $filterCabang;
 }
 
 // Batasi data ke cabang sendiri untuk role pic yang sudah di-set cabang-nya
@@ -400,6 +406,21 @@ $sql = "SELECT s.*, k.asset_id, k.no_polisi, k.merk, k.model, k.cabang, k.jenis_
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $servisList = $stmt->fetchAll();
+
+// Ringkasan nominal (keseluruhan & per cabang) mengikuti filter yang sedang aktif
+// (kendaraan/tanggal/cabang), bukan dibatasi pagination seperti $servisList di atas.
+$stmtNominalTotal = $pdo->prepare("SELECT COALESCE(SUM(s.nominal), 0) FROM riwayat_servis s LEFT JOIN kendaraan k ON s.kendaraan_id = k.id $whereSql");
+$stmtNominalTotal->execute($params);
+$totalNominalFiltered = (int)$stmtNominalTotal->fetchColumn();
+
+$stmtNominalPerCabang = $pdo->prepare("SELECT COALESCE(k.cabang, 'Umum (Tanpa Kendaraan)') as cabang_label, COUNT(*) as jumlah, COALESCE(SUM(s.nominal), 0) as total_nominal
+    FROM riwayat_servis s
+    LEFT JOIN kendaraan k ON s.kendaraan_id = k.id
+    $whereSql
+    GROUP BY cabang_label
+    ORDER BY total_nominal DESC");
+$stmtNominalPerCabang->execute($params);
+$nominalPerCabang = $stmtNominalPerCabang->fetchAll();
 
 $statJoinCb = $scopeCabang ? " JOIN kendaraan k2 ON s.kendaraan_id = k2.id AND k2.cabang = :scopeCb2" : "";
 $statCbParams = $scopeCabang ? [':scopeCb2' => $scopeCabang] : [];
@@ -488,7 +509,7 @@ require_once __DIR__ . '/../includes/layout_navbar.php';
             <button type="button" onclick="openModal('modal-import-servis')" class="btn-secondary text-xs py-2 px-3" title="Import dari CSV">
                 <i class="fa-solid fa-file-import text-blue-600"></i> Import
             </button>
-            <a href="<?= BASE_URL ?>/public/export_excel.php?type=servis<?= $filterKendaraanId ? '&kendaraan_id=' . $filterKendaraanId : '' ?><?= $filterTglAwal ? '&tgl_awal=' . urlencode($filterTglAwal) : '' ?><?= $filterTglAkhir ? '&tgl_akhir=' . urlencode($filterTglAkhir) : '' ?>" class="btn-secondary text-xs py-2 px-3" title="Export Excel / CSV">
+            <a href="<?= BASE_URL ?>/public/export_excel.php?type=servis<?= $filterKendaraanId ? '&kendaraan_id=' . $filterKendaraanId : '' ?><?= $filterTglAwal ? '&tgl_awal=' . urlencode($filterTglAwal) : '' ?><?= $filterTglAkhir ? '&tgl_akhir=' . urlencode($filterTglAkhir) : '' ?><?= $filterCabang ? '&cabang=' . urlencode($filterCabang) : '' ?>" class="btn-secondary text-xs py-2 px-3" title="Export Excel / CSV">
                 <i class="fa-solid fa-file-excel text-emerald-600"></i> Export
             </a>
             <button type="button" onclick="openModal('modal-tambah-servis')" class="btn-primary text-xs py-2 px-3.5">

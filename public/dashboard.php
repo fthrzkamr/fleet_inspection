@@ -433,7 +433,7 @@ require_once __DIR__ . '/../includes/layout_navbar.php';
         </div>
     </div>
 
-    <!-- Live Fleet Operational Status Table -->
+    <!-- Live Vehicle Operational Status Table -->
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden p-5 space-y-3">
         <div id="ajax-table-wrap" class="space-y-3">
             <?php require __DIR__ . '/../includes/partial_dashboard_table.php'; ?>

@@ -67,7 +67,7 @@ require_once __DIR__ . '/../includes/layout_navbar.php';
                 </div>
                 <div>
                     <div class="font-bold text-xs tracking-tight text-slate-900 leading-none"><?= APP_NAME ?></div>
-                    <div class="text-[8px] font-extrabold text-slate-500 uppercase tracking-wider">OFFICIAL FLEET TAG</div>
+                    <div class="text-[8px] font-extrabold text-slate-500 uppercase tracking-wider">TAG MONITORING RESMI</div>
                 </div>
             </div>
             <div class="text-right">

@@ -1,6 +1,6 @@
 <?php
 /**
- * Helper Functions & Logika Bisnis Aplikasi Fleet Inspection
+ * Helper Functions & Logika Bisnis Aplikasi Sistem Monitoring Kendaraan
  */
 
 require_once __DIR__ . '/../config.php';

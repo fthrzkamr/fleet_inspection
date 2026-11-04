@@ -1,6 +1,6 @@
 <?php
 /**
- * Konfigurasi Utama Aplikasi Fleet Inspection
+ * Konfigurasi Utama Aplikasi Sistem Monitoring Kendaraan
  * Mendukung PHP 7.4+ Native
  */
 
@@ -28,7 +28,7 @@ if (file_exists($localConfigFile)) {
 }
 
 // Konfigurasi Base URL & Path
-define('APP_NAME', 'FleetGuard Digital');
+define('APP_NAME', 'Sistem Monitoring Kendaraan');
 define('BASE_PATH', __DIR__);
 define('UPLOADS_PATH', BASE_PATH . '/uploads');
 

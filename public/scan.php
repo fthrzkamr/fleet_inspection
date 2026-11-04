@@ -19,7 +19,7 @@ $stmt = $pdo->prepare("SELECT id, asset_id, no_polisi, merk, model, cabang FROM 
 $stmt->execute($scopeCabang ? [':cb' => $scopeCabang] : []);
 $quickVehicles = $stmt->fetchAll();
 
-$pageTitle = 'Pindai QR Armada - ' . APP_NAME;
+$pageTitle = 'Pindai QR Armada';
 require_once __DIR__ . '/../includes/layout_header.php';
 require_once __DIR__ . '/../includes/layout_navbar.php';
 ?>

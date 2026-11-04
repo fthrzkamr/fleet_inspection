@@ -1,7 +1,7 @@
 <?php
 /**
  * Database Auto-Installer & Seeder Script - Enterprise UI
- * Fleet Inspection Web App
+ * Sistem Monitoring Kendaraan Web App
  */
 
 require_once __DIR__ . '/../config.php';
@@ -97,7 +97,7 @@ try {
             'no_wa'    => '081277776666'
         ],
         [
-            'nama'     => 'Hendra Wijaya (Fleet PIC)',
+            'nama'     => 'Hendra Wijaya (PIC Kendaraan)',
             'username' => 'pic',
             'password' => 'pic123',
             'role'     => 'pic',
@@ -293,7 +293,7 @@ try {
                         <div class="text-slate-600">Pass: <code class="font-bold text-slate-900">petugas123</code></div>
                     </div>
                     <div class="p-2.5 bg-white border border-slate-200 rounded-lg">
-                        <div class="font-bold text-purple-700">PIC Fleet</div>
+                        <div class="font-bold text-purple-700">PIC Kendaraan</div>
                         <div class="text-slate-600 mt-0.5">User: <code class="font-bold text-slate-900">pic</code></div>
                         <div class="text-slate-600">Pass: <code class="font-bold text-slate-900">pic123</code></div>
                     </div>

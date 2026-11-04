@@ -1,5 +1,5 @@
 /**
- * FleetGuard Digital - Client Script Helper
+ * Sistem Monitoring Kendaraan - Client Script Helper
  */
 
 document.addEventListener('DOMContentLoaded', () => {

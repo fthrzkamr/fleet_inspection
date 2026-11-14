@@ -50,6 +50,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 ':qr_path'   => $qrPath
             ]);
 
+            log_activity(
+                'TAMBAH_KENDARAAN',
+                'Kendaraan',
+                "Mendaftarkan armada baru $merk $model ($no_polisi) dengan Asset ID $asset_id di cabang $cabang",
+                $no_polisi
+            );
+
             flash_set('success', "Armada baru berhasil didaftarkan dengan ID $asset_id dan QR Code telah dibuat.");
             session_write_close();
             header('Location: ' . BASE_URL . '/public/daftar_kendaraan.php');
@@ -82,6 +89,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         unlink($qrFullPath);
                     }
                 }
+
+                log_activity(
+                    'HAPUS_KENDARAAN',
+                    'Kendaraan',
+                    "Menghapus permanen armada {$targetKendaraan['merk']} {$targetKendaraan['model']} ({$targetKendaraan['no_polisi']} / {$targetKendaraan['asset_id']}) dari cabang {$targetKendaraan['cabang']}",
+                    $targetKendaraan['no_polisi']
+                );
 
                 flash_set('success', "Armada '{$targetKendaraan['no_polisi']}' ({$targetKendaraan['asset_id']}) beserta seluruh riwayat inspeksi dan servisnya berhasil dihapus permanen.");
             } catch (PDOException $e) {

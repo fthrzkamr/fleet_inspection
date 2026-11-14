@@ -62,6 +62,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     ]);
     $newInspeksiId = $pdo->lastInsertId();
 
+    log_activity(
+        'MULAI_INSPEKSI',
+        'Inspeksi',
+        "Memulai sesi inspeksi fisik untuk armada {$kendaraan['asset_id']} ({$kendaraan['no_polisi']} - {$kendaraan['merk']} {$kendaraan['model']})",
+        $kendaraan['no_polisi']
+    );
+
     header('Location: ' . BASE_URL . '/public/inspeksi_eksterior.php?inspeksi_id=' . $newInspeksiId);
     exit;
 }

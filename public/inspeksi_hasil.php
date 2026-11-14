@@ -98,6 +98,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
         $pdo->commit();
 
+        $hasilLabel = [
+            'ok'    => 'LAYAK JALAN (Aman)',
+            'minor' => 'PERLU PERBAIKAN / MINOR',
+            'mayor' => 'TIDAK LAYAK JALAN / STOP ARMADA'
+        ][$finalHasil] ?? strtoupper($finalHasil);
+
+        log_activity(
+            'SELESAI_INSPEKSI',
+            'Inspeksi',
+            "Menyelesaikan inspeksi armada {$inspeksi['asset_id']} ({$inspeksi['no_polisi']} - {$inspeksi['merk']} {$inspeksi['model']}) dengan status: $hasilLabel",
+            $inspeksi['no_polisi']
+        );
+
         $msgSuccess = 'Inspeksi armada ' . $inspeksi['asset_id'] . ' berhasil diselesaikan dengan hasil: ' . strtoupper($finalHasil) . '.';
         flash_set('success', $msgSuccess);
 

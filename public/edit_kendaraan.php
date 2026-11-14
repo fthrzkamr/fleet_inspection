@@ -97,6 +97,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':uid' => $user['id']
                 ]);
 
+                log_activity(
+                    'EDIT_KENDARAAN',
+                    'Kendaraan',
+                    "Memperbarui identitas armada {$kendaraan['asset_id']} ($no_polisi - $merk $model), status: $status, cabang: $cabang",
+                    $no_polisi
+                );
+
                 flash_set('success', 'Identitas kendaraan berhasil diperbarui. Asset ID & QR Code tetap tersambung.');
                 session_write_close();
                 header('Location: ' . BASE_URL . '/public/edit_kendaraan.php?id=' . $id);
@@ -164,6 +171,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]);
 
                 $pdo->commit();
+
+                log_activity(
+                    'REFRESH_ARMADA',
+                    'Kendaraan',
+                    "Refresh armada unit lama {$kendaraan['asset_id']} ({$kendaraan['no_polisi']}) dinonaktifkan ($reasonOld), digantikan unit baru $newAssetId ($new_nopol - $new_merk $new_model)",
+                    $new_nopol
+                );
 
                 flash_set('success', "Refresh Armada Berhasil! Unit lama ({$kendaraan['asset_id']}) dinonaktifkan ($reasonOld) dan unit baru ($newAssetId - $new_nopol) berhasil didaftarkan.");
                 session_write_close();

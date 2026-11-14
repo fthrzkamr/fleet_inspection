@@ -18,14 +18,110 @@ if ($type === 'servis' && $user['role'] !== 'admin') {
     exit;
 }
 
+if (in_array($type, ['log_aktivitas', 'activity_log']) && $user['role'] !== 'admin') {
+    $_SESSION['flash_error'] = 'Anda tidak memiliki hak akses untuk export Log Aktivitas.';
+    header('Location: ' . BASE_URL . '/public/dashboard.php');
+    exit;
+}
+
 // Batasi export ke cabang sendiri untuk role pic yang sudah di-set cabang-nya
 $scopeCabang = ($user['role'] === 'pic' && !empty($user['cabang'])) ? $user['cabang'] : null;
+
+log_activity('EXPORT_EXCEL', 'Laporan', "Mengunduh export data $type ke file CSV / Excel", $type);
 
 // Semicolon dipakai sebagai delimiter (bukan koma) supaya Excel dengan region Indonesia
 // otomatis memecah kolom dengan benar saat file CSV dibuka langsung (double-click).
 $delimiter = ';';
 
-if ($type === 'servis') {
+if (in_array($type, ['log_aktivitas', 'activity_log'])) {
+    $filename = 'log_aktivitas_' . date('Ymd_His') . '.csv';
+
+    header('Content-Type: text/csv; charset=UTF-8');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+
+    $output = fopen('php://output', 'w');
+    fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+
+    // Headers
+    fputcsv($output, ['No', 'ID Log', 'Waktu', 'Nama User', 'Username', 'Role', 'Cabang', 'Modul', 'Aksi', 'Deskripsi Aktivitas', 'Target / Ref', 'IP Address', 'User Agent'], $delimiter);
+
+    $filterQ        = trim($_GET['q'] ?? '');
+    $filterUserId   = (int)($_GET['user_id'] ?? 0);
+    $filterRole     = trim($_GET['role'] ?? '');
+    $filterModule   = trim($_GET['module'] ?? '');
+    $filterAction   = trim($_GET['action'] ?? '');
+    $filterCabang   = trim($_GET['cabang'] ?? '');
+    $filterTglAwal  = trim($_GET['tgl_awal'] ?? '');
+    $filterTglAkhir = trim($_GET['tgl_akhir'] ?? '');
+
+    $whereSql = " WHERE 1=1";
+    $params   = [];
+
+    if (!empty($filterQ)) {
+        $whereSql .= " AND (description LIKE :q1 OR user_nama LIKE :q2 OR user_username LIKE :q3 OR target_id LIKE :q4 OR ip_address LIKE :q5)";
+        $params[':q1'] = "%$filterQ%";
+        $params[':q2'] = "%$filterQ%";
+        $params[':q3'] = "%$filterQ%";
+        $params[':q4'] = "%$filterQ%";
+        $params[':q5'] = "%$filterQ%";
+    }
+    if ($filterUserId > 0) {
+        $whereSql .= " AND user_id = :uid";
+        $params[':uid'] = $filterUserId;
+    }
+    if (!empty($filterRole)) {
+        $whereSql .= " AND user_role = :role";
+        $params[':role'] = $filterRole;
+    }
+    if (!empty($filterModule)) {
+        $whereSql .= " AND module = :mod";
+        $params[':mod'] = $filterModule;
+    }
+    if (!empty($filterAction)) {
+        $whereSql .= " AND action = :act";
+        $params[':act'] = $filterAction;
+    }
+    if (!empty($filterCabang)) {
+        $whereSql .= " AND cabang = :cabang";
+        $params[':cabang'] = $filterCabang;
+    }
+    if (!empty($filterTglAwal)) {
+        $whereSql .= " AND DATE(created_at) >= :tgl_awal";
+        $params[':tgl_awal'] = $filterTglAwal;
+    }
+    if (!empty($filterTglAkhir)) {
+        $whereSql .= " AND DATE(created_at) <= :tgl_akhir";
+        $params[':tgl_akhir'] = $filterTglAkhir;
+    }
+
+    $stmt = $pdo->prepare("SELECT * FROM activity_logs $whereSql ORDER BY id DESC");
+    $stmt->execute($params);
+
+    $no = 1;
+    while ($row = $stmt->fetch()) {
+        fputcsv($output, [
+            $no++,
+            $row['id'],
+            $row['created_at'] ? date('d/m/Y H:i:s', strtotime($row['created_at'])) : '',
+            $row['user_nama'],
+            $row['user_username'],
+            strtoupper($row['user_role']),
+            $row['cabang'] ?: '-',
+            $row['module'],
+            $row['action'],
+            $row['description'],
+            $row['target_id'] ?: '-',
+            $row['ip_address'] ?: '-',
+            $row['user_agent'] ?: '-'
+        ], $delimiter);
+    }
+
+    fclose($output);
+    exit;
+
+} elseif ($type === 'servis') {
     $filename = 'riwayat_servis_' . date('Ymd_His') . '.csv';
 
     header('Content-Type: text/csv; charset=UTF-8');

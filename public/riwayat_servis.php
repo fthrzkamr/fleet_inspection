@@ -42,6 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             ':belum'      => $belumDiganti ?: null,
             ':uid'        => $user['id']
         ]);
+        $nomFormatted = $nominal !== '' ? 'Rp ' . number_format((int)str_replace(['.', ','], '', $nominal), 0, ',', '.') : '-';
+        log_activity('TAMBAH_SERVIS', 'Servis', "Mencatat servis baru: $jenis pada tgl $tanggal (Bengkel: " . ($bengkel ?: '-') . ", Biaya: $nomFormatted)", $kendaraanId > 0 ? "Kendaraan ID #$kendaraanId" : null);
         flash_set('success', 'Riwayat servis berhasil dicatat.');
         session_write_close();
         header('Location: ' . BASE_URL . '/public/riwayat_servis.php');
@@ -82,6 +84,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             ':belum'      => $belumDiganti ?: null,
             ':id'         => $id
         ]);
+        $nomFormatted = $nominal !== '' ? 'Rp ' . number_format((int)str_replace(['.', ','], '', $nominal), 0, ',', '.') : '-';
+        log_activity('EDIT_SERVIS', 'Servis', "Memperbarui data servis ID #$id: $jenis pada tgl $tanggal (Biaya: $nomFormatted)", "Servis ID #$id");
         flash_set('success', 'Riwayat servis berhasil diperbarui.');
         session_write_close();
         header('Location: ' . BASE_URL . '/public/riwayat_servis.php');
@@ -93,6 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_servis') {
     $id = (int)($_POST['delete_id'] ?? 0);
     $pdo->prepare("DELETE FROM riwayat_servis WHERE id = :id")->execute([':id' => $id]);
+    log_activity('HAPUS_SERVIS', 'Servis', "Menghapus catatan servis ID #$id", "Servis ID #$id");
     flash_set('success', 'Riwayat servis berhasil dihapus.');
     session_write_close();
     header('Location: ' . BASE_URL . '/public/riwayat_servis.php');

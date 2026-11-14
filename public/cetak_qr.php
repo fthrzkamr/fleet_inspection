@@ -36,6 +36,8 @@ if (empty($kendaraan['qr_code_path']) || !file_exists($qrFullPath)) {
 }
 $qrCacheBust = '?v=' . filemtime($qrFullPath);
 
+log_activity('CETAK_QR', 'Kendaraan', "Membuka halaman cetak stiker QR untuk armada {$kendaraan['asset_id']} ({$kendaraan['no_polisi']})", $kendaraan['no_polisi']);
+
 $pageTitle = 'Cetak Stiker QR: ' . $kendaraan['asset_id'];
 require_once __DIR__ . '/../includes/layout_header.php';
 require_once __DIR__ . '/../includes/layout_navbar.php';

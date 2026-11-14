@@ -22,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         if (attempt_login($username, $password)) {
             $user = current_user();
+            log_activity('LOGIN', 'Autentikasi', 'User berhasil login ke sistem', $user['username'], $user);
             flash_set('success', 'Selamat datang, ' . $user['nama'] . '.');
             
             $target = $_SESSION['redirect_after_login'] ?? null;
@@ -39,6 +40,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         } else {
             $error = 'Username atau password yang Anda masukkan tidak sesuai.';
+            log_activity('LOGIN_GAGAL', 'Autentikasi', 'Percobaan login gagal dengan username: ' . $username, $username, [
+                'id' => null, 'nama' => 'Percobaan Login', 'username' => $username, 'role' => 'guest', 'cabang' => null
+            ]);
         }
     }
 }

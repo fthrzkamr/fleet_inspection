@@ -427,3 +427,92 @@ function render_pagination($currentPage, $totalItems, $perPage = 10, $customPara
     <?php
     return ob_get_clean();
 }
+
+/**
+ * Format Waktu Relatif Bahasa Indonesia (contoh: 'Baru saja', '5 mnt lalu', '2 jam lalu')
+ */
+function time_ago_id($datetime) {
+    if (empty($datetime)) return '-';
+    $time = is_numeric($datetime) ? (int)$datetime : strtotime($datetime);
+    if (!$time) return '-';
+    $diff = time() - $time;
+    if ($diff < 60) return 'Baru saja';
+    if ($diff < 3600) return floor($diff / 60) . ' mnt lalu';
+    if ($diff < 86400) return floor($diff / 3600) . ' jam lalu';
+    if ($diff < 172800) return 'Kemarin ' . date('H:i', $time);
+    if ($diff < 604800) return floor($diff / 86400) . ' hari lalu';
+    return date('d/m/Y H:i', $time);
+}
+
+/**
+ * Catat Log Aktivitas Pengguna (User Activity Log)
+ *
+ * @param string $action      Nama aksi (misal: 'LOGIN', 'LOGOUT', 'TAMBAH_KENDARAAN', 'EDIT_SERVIS', dll)
+ * @param string $module      Modul sistem (misal: 'Autentikasi', 'Kendaraan', 'Inspeksi', 'Servis', 'Master Cabang', 'Kelola User', 'Laporan')
+ * @param string $description Penjelasan aktivitas yang dilakukan
+ * @param string|null $targetId Referensi/ID objek (No Polisi, ID Kendaraan, Kode Cabang, dll)
+ * @param array|null $userOverride Jika ingin mencatat untuk user tertentu (misal saat login sebelum session terbentuk)
+ * @return bool
+ */
+function log_activity($action, $module, $description, $targetId = null, $userOverride = null) {
+    try {
+        $pdo = get_db();
+
+        if ($userOverride) {
+            $user = $userOverride;
+        } elseif (function_exists('current_user')) {
+            $user = current_user();
+        } else {
+            require_once __DIR__ . '/auth.php';
+            $user = current_user();
+        }
+
+        $userId       = $user['id'] ?? null;
+        $userNama     = $user['nama'] ?? ($user['username'] ?? 'Tamu / Sistem');
+        $userUsername = $user['username'] ?? 'guest';
+        $userRole     = $user['role'] ?? 'guest';
+        $cabang       = $user['cabang'] ?? null;
+
+        // Ambil IP Address secara aman
+        $ip = $_SERVER['HTTP_CLIENT_IP'] 
+            ?? $_SERVER['HTTP_X_FORWARDED_FOR'] 
+            ?? $_SERVER['REMOTE_ADDR'] 
+            ?? '127.0.0.1';
+        if (strpos($ip, ',') !== false) {
+            $ipParts = explode(',', $ip);
+            $ip = trim($ipParts[0]);
+        }
+        $ip = substr($ip, 0, 45);
+
+        // Ambil User Agent
+        $userAgent = substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255);
+
+        $stmt = $pdo->prepare("
+            INSERT INTO activity_logs (
+                user_id, user_nama, user_username, user_role, cabang,
+                action, module, description, target_id, ip_address, user_agent
+            ) VALUES (
+                :uid, :nama, :uname, :role, :cabang,
+                :act, :mod, :desc, :target, :ip, :ua
+            )
+        ");
+
+        return $stmt->execute([
+            ':uid'    => $userId,
+            ':nama'   => $userNama,
+            ':uname'  => $userUsername,
+            ':role'   => $userRole,
+            ':cabang' => $cabang,
+            ':act'    => strtoupper($action),
+            ':mod'    => $module,
+            ':desc'   => $description,
+            ':target' => $targetId !== null ? (string)$targetId : null,
+            ':ip'     => $ip,
+            ':ua'     => $userAgent
+        ]);
+    } catch (Exception $e) {
+        // Jangan pernah memblokir jalannya flow aplikasi jika logging bermasalah
+        error_log("Failed to write activity log: " . $e->getMessage());
+        return false;
+    }
+}

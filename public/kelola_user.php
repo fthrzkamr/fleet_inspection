@@ -36,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 ':cabang'   => $cabang ?: null,
                 ':no_wa'    => $noWa ?: null
             ]);
+            log_activity('TAMBAH_USER', 'Kelola User', "Menambahkan user baru: $nama (@$username), role: " . strtoupper($role) . ", cabang: " . ($cabang ?: 'Pusat'), $username);
             flash_set('success', "User '$nama' berhasil ditambahkan.");
             session_write_close();
             header('Location: ' . BASE_URL . '/public/kelola_user.php');
@@ -88,6 +89,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $_SESSION['user_cabang'] = $cabang;
             }
 
+            $passInfo = ($password !== '') ? ' (password diubah)' : '';
+            log_activity('EDIT_USER', 'Kelola User', "Memperbarui data user: $nama (@$username), role: " . strtoupper($role) . ", cabang: " . ($cabang ?: 'Pusat') . $passInfo, $username);
+
             flash_set('success', "Data user '$nama' berhasil diperbarui.");
             session_write_close();
             header('Location: ' . BASE_URL . '/public/kelola_user.php');
@@ -114,6 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         } else {
             try {
                 $pdo->prepare("DELETE FROM users WHERE id = :id")->execute([':id' => $id]);
+                log_activity('HAPUS_USER', 'Kelola User', "Menghapus user: {$target['nama']} (@{$target['username']}), role: " . strtoupper($target['role']), $target['username']);
                 flash_set('success', "User '{$target['nama']}' berhasil dihapus.");
             } catch (PDOException $e) {
                 flash_set('error', "User '{$target['nama']}' tidak dapat dihapus karena masih memiliki riwayat inspeksi terkait.");

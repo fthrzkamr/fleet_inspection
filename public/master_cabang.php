@@ -30,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 ':alamat' => $alamat,
                 ':pic'    => $pic
             ]);
+            log_activity('TAMBAH_CABANG', 'Master Cabang', "Menambahkan cabang baru: $nama ($kode), PIC: $pic", $kode);
             flash_set('success', "Cabang baru '$nama ($kode)' berhasil ditambahkan.");
             session_write_close();
             header('Location: ' . BASE_URL . '/public/master_cabang.php');
@@ -68,6 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 ':status' => $status,
                 ':id'     => $id
             ]);
+            log_activity('EDIT_CABANG', 'Master Cabang', "Memperbarui data cabang $nama ($kode), status: $status, PIC: $pic", $kode);
             flash_set('success', "Data cabang '$nama' berhasil diperbarui.");
             session_write_close();
             header('Location: ' . BASE_URL . '/public/master_cabang.php');
@@ -87,6 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if ($cab) {
         $newStatus = ($cab['status'] === 'active') ? 'inactive' : 'active';
         $pdo->prepare("UPDATE cabang SET status = :st WHERE id = :id")->execute([':st' => $newStatus, ':id' => $id]);
+        log_activity('STATUS_CABANG', 'Master Cabang', "Mengubah status cabang '{$cab['nama_cabang']}' menjadi " . strtoupper($newStatus), $cab['nama_cabang']);
         flash_set('success', "Status cabang '{$cab['nama_cabang']}' diubah menjadi " . strtoupper($newStatus) . ".");
     } else {
         flash_set('error', 'Data cabang tidak ditemukan.');
@@ -112,6 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             flash_set('error', "Cabang '{$cab['nama_cabang']}' tidak dapat dihapus karena masih digunakan oleh $assignedCount unit armada aktif.");
         } else {
             $pdo->prepare("DELETE FROM cabang WHERE id = :id")->execute([':id' => $id]);
+            log_activity('HAPUS_CABANG', 'Master Cabang', "Menghapus cabang '{$cab['nama_cabang']}' ({$cab['kode_cabang']})", $cab['kode_cabang']);
             flash_set('success', "Cabang '{$cab['nama_cabang']}' berhasil dihapus dari master data.");
         }
     } else {

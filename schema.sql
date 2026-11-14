@@ -129,3 +129,25 @@ CREATE INDEX IF NOT EXISTS idx_inspeksi_petugas ON inspeksi(petugas_id);
 CREATE INDEX IF NOT EXISTS idx_inspeksi_tanggal ON inspeksi(tanggal_mulai);
 CREATE INDEX IF NOT EXISTS idx_riwayat_servis_kendaraan ON riwayat_servis(kendaraan_id);
 CREATE INDEX IF NOT EXISTS idx_riwayat_servis_tanggal ON riwayat_servis(tanggal_servis);
+
+-- 8. Tabel Log Aktivitas Pengguna (User Activity Log)
+CREATE TABLE IF NOT EXISTS activity_logs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NULL,
+  user_nama VARCHAR(100) NOT NULL,
+  user_username VARCHAR(50) NOT NULL,
+  user_role VARCHAR(20) NOT NULL,
+  cabang VARCHAR(50) NULL,
+  action VARCHAR(50) NOT NULL,
+  module VARCHAR(50) NOT NULL,
+  description TEXT NOT NULL,
+  target_id VARCHAR(50) NULL,
+  ip_address VARCHAR(45) NULL,
+  user_agent VARCHAR(255) NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_activity_user_id (user_id),
+  INDEX idx_activity_created_at (created_at),
+  INDEX idx_activity_module (module),
+  INDEX idx_activity_action (action),
+  INDEX idx_activity_cabang (cabang)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

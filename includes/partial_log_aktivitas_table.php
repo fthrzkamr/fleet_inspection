@@ -48,8 +48,10 @@ $roleBadgeColors = [
     'pic'     => 'bg-purple-100 text-purple-800 border-purple-200'
 ];
 
+$scopeCabang = $scopeCabang ?? (($user['role'] === 'pic' && !empty($user['cabang'])) ? $user['cabang'] : null);
+
 $hasActiveFilter = !empty($filterQ) || !empty($filterUserId) || !empty($filterRole) 
-                || !empty($filterModule) || !empty($filterAction) || !empty($filterCabang) 
+                || !empty($filterModule) || !empty($filterAction) || (!empty($filterCabang) && !$scopeCabang) 
                 || !empty($filterTglAwal) || !empty($filterTglAkhir);
 
 // Build URL query untuk export
@@ -110,10 +112,17 @@ $exportUrl = BASE_URL . '/public/export_excel.php?' . http_build_query($exportPa
 
 <!-- Filter Bar -->
 <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+    <?php if ($scopeCabang): ?>
+        <div class="mb-3 px-3.5 py-2 rounded-lg bg-blue-50 border border-blue-200 text-xs text-blue-800 flex items-center justify-between">
+            <span><i class="fa-solid fa-location-dot mr-1.5 text-blue-600"></i> Menampilkan log aktivitas untuk <b>Cabang <?= htmlspecialchars($scopeCabang) ?></b>.</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-blue-700 bg-white px-2 py-0.5 rounded border border-blue-200">Akses PIC</span>
+        </div>
+    <?php endif; ?>
+
     <form method="GET" class="space-y-3">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
             <!-- Keyword Search -->
-            <div class="lg:col-span-3">
+            <div class="<?= $scopeCabang ? 'lg:col-span-4' : 'lg:col-span-3' ?>">
                 <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Cari Kata Kunci</label>
                 <div class="relative">
                     <input type="text" name="q" value="<?= htmlspecialchars($filterQ) ?>" 
@@ -124,7 +133,7 @@ $exportUrl = BASE_URL . '/public/export_excel.php?' . http_build_query($exportPa
             </div>
 
             <!-- Filter User -->
-            <div class="lg:col-span-2">
+            <div class="<?= $scopeCabang ? 'lg:col-span-3' : 'lg:col-span-2' ?>">
                 <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">User</label>
                 <select name="user_id" class="w-full py-2 px-3 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 focus:border-blue-600 outline-none">
                     <option value="">-- Semua User --</option>
@@ -148,7 +157,7 @@ $exportUrl = BASE_URL . '/public/export_excel.php?' . http_build_query($exportPa
             </div>
 
             <!-- Filter Modul -->
-            <div class="lg:col-span-2">
+            <div class="<?= $scopeCabang ? 'lg:col-span-3' : 'lg:col-span-2' ?>">
                 <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Modul</label>
                 <select name="module" class="w-full py-2 px-3 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 focus:border-blue-600 outline-none">
                     <option value="">-- Semua Modul --</option>
@@ -160,6 +169,7 @@ $exportUrl = BASE_URL . '/public/export_excel.php?' . http_build_query($exportPa
                 </select>
             </div>
 
+            <?php if (!$scopeCabang): ?>
             <!-- Filter Cabang -->
             <div class="lg:col-span-3">
                 <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Cabang</label>
@@ -172,6 +182,7 @@ $exportUrl = BASE_URL . '/public/export_excel.php?' . http_build_query($exportPa
                     <?php endforeach; ?>
                 </select>
             </div>
+            <?php endif; ?>
         </div>
 
         <!-- Baris Kedua: Rentang Tanggal + Tombol Aksi -->

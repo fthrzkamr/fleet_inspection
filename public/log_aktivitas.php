@@ -1,17 +1,21 @@
 <?php
 /**
- * Halaman Log Aktivitas Pengguna (Admin Only) - Enterprise UI
+ * Halaman Log Aktivitas Pengguna (Admin & PIC) - Enterprise UI
  * Sistem Monitoring Kendaraan
  */
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/functions.php';
 
-// Hak akses khusus Administrator
-require_role('admin');
+// Hak akses khusus Administrator dan PIC
+require_role(['admin', 'pic']);
 
 $pdo = get_db();
 $user = current_user();
+
+// Batasi data ke cabang sendiri untuk role pic yang sudah di-set cabang-nya.
+// Admin (dan PIC yang belum di-set cabang-nya) tetap melihat semua cabang.
+$scopeCabang = ($user['role'] === 'pic' && !empty($user['cabang'])) ? $user['cabang'] : null;
 
 // Parameter Filter
 $filterQ        = trim($_GET['q'] ?? '');
@@ -25,6 +29,11 @@ $filterTglAkhir = trim($_GET['tgl_akhir'] ?? '');
 
 $whereSql = " WHERE 1=1";
 $params   = [];
+
+if ($scopeCabang) {
+    $whereSql .= " AND cabang = :scopeCb";
+    $params[':scopeCb'] = $scopeCabang;
+}
 
 if (!empty($filterQ)) {
     $whereSql .= " AND (description LIKE :q1 OR user_nama LIKE :q2 OR user_username LIKE :q3 OR target_id LIKE :q4 OR ip_address LIKE :q5)";
@@ -55,7 +64,7 @@ if (!empty($filterAction)) {
     $params[':act'] = $filterAction;
 }
 
-if (!empty($filterCabang)) {
+if (!$scopeCabang && !empty($filterCabang)) {
     $whereSql .= " AND cabang = :cabang";
     $params[':cabang'] = $filterCabang;
 }
@@ -84,13 +93,28 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $logs = $stmt->fetchAll();
 
-// KPI Statistik
-$statTotalToday = (int)$pdo->query("SELECT COUNT(*) FROM activity_logs WHERE DATE(created_at) = CURDATE()")->fetchColumn();
-$statTopUser    = $pdo->query("SELECT user_nama, COUNT(*) as total FROM activity_logs WHERE user_nama != '' GROUP BY user_nama ORDER BY total DESC LIMIT 1")->fetch();
-$statTopModule  = $pdo->query("SELECT module, COUNT(*) as total FROM activity_logs WHERE module != '' GROUP BY module ORDER BY total DESC LIMIT 1")->fetch();
+// KPI Statistik (Disesuaikan dengan scope cabang jika PIC)
+$statCabangSql = $scopeCabang ? " AND cabang = :scopeCb" : "";
+$statCabangParams = $scopeCabang ? [':scopeCb' => $scopeCabang] : [];
+
+$stmtToday = $pdo->prepare("SELECT COUNT(*) FROM activity_logs WHERE DATE(created_at) = CURDATE()" . $statCabangSql);
+$stmtToday->execute($statCabangParams);
+$statTotalToday = (int)$stmtToday->fetchColumn();
+
+$stmtTopUser = $pdo->prepare("SELECT user_nama, COUNT(*) as total FROM activity_logs WHERE user_nama != ''" . $statCabangSql . " GROUP BY user_nama ORDER BY total DESC LIMIT 1");
+$stmtTopUser->execute($statCabangParams);
+$statTopUser = $stmtTopUser->fetch();
+
+$stmtTopModule = $pdo->prepare("SELECT module, COUNT(*) as total FROM activity_logs WHERE module != ''" . $statCabangSql . " GROUP BY module ORDER BY total DESC LIMIT 1");
+$stmtTopModule->execute($statCabangParams);
+$statTopModule = $stmtTopModule->fetch();
 
 // Master Options untuk Filter Dropdown
-$allUsers   = $pdo->query("SELECT id, nama, username FROM users ORDER BY nama ASC")->fetchAll();
+$allUsersSql = "SELECT id, nama, username FROM users" . ($scopeCabang ? " WHERE cabang = :scopeCb" : "") . " ORDER BY nama ASC";
+$stmtUsers = $pdo->prepare($allUsersSql);
+$stmtUsers->execute($scopeCabang ? [':scopeCb' => $scopeCabang] : []);
+$allUsers = $stmtUsers->fetchAll();
+
 $allModules = $pdo->query("SELECT DISTINCT module FROM activity_logs ORDER BY module ASC")->fetchAll(PDO::FETCH_COLUMN);
 if (empty($allModules)) {
     $allModules = ['Autentikasi', 'Kendaraan', 'Inspeksi', 'Servis', 'Master Cabang', 'Kelola User', 'Laporan'];

@@ -18,7 +18,7 @@ if ($type === 'servis' && $user['role'] !== 'admin') {
     exit;
 }
 
-if (in_array($type, ['log_aktivitas', 'activity_log']) && !in_array($user['role'], ['admin', 'pic'])) {
+if (in_array($type, ['log_aktivitas', 'activity_log']) && $user['role'] !== 'admin') {
     $_SESSION['flash_error'] = 'Anda tidak memiliki hak akses untuk export Log Aktivitas.';
     header('Location: ' . BASE_URL . '/public/dashboard.php');
     exit;
@@ -83,10 +83,7 @@ if (in_array($type, ['log_aktivitas', 'activity_log'])) {
         $whereSql .= " AND action = :act";
         $params[':act'] = $filterAction;
     }
-    if ($scopeCabang) {
-        $whereSql .= " AND cabang = :scopeCb";
-        $params[':scopeCb'] = $scopeCabang;
-    } elseif (!empty($filterCabang)) {
+    if (!empty($filterCabang)) {
         $whereSql .= " AND cabang = :cabang";
         $params[':cabang'] = $filterCabang;
     }

@@ -44,10 +44,6 @@ $roleBadge = [
         <a href="<?= BASE_URL ?>/public/kelola_user.php" class="nav-link <?= $currentScript === 'kelola_user.php' ? 'nav-link-active' : '' ?>">
             <i class="fa-solid fa-users-gear w-4 text-center"></i> Kelola User
         </a>
-<?php
-        endif;
-        if (in_array($currentUser['role'], ['admin', 'pic'])):
-?>
         <a href="<?= BASE_URL ?>/public/log_aktivitas.php" class="nav-link <?= $currentScript === 'log_aktivitas.php' ? 'nav-link-active' : '' ?>">
             <i class="fa-solid fa-clock-rotate-left w-4 text-center"></i> Log Aktivitas
         </a>
